@@ -42,7 +42,7 @@ import Data.Conduit
 import qualified Data.Conduit.List as CL
 import Network.HTTP.Types
 import Network.Wai
-
+import Network.Wai.Internal
 
 -- | 404 \"File not found\"
 notFound :: Response
@@ -68,8 +68,7 @@ respApp resp _ = liftIO $ return resp
 -- The actual type returns @'Either' 'Response' /b/@ so that if an error
 -- occurs, the application can return an error response of some sort, rather
 -- than JSON.
-type JsonApplication a b = a -> ResourceT IO (Either Response b)
-
+type JsonApplication a b = a -> IO (Either Response b)
 -- | Transforms a 'JsonApplication' into an 'Application'. If a value of type
 -- @/a/@ cannot be parsed from the JSON in the request, then 'badRequest'
 -- results.
@@ -85,11 +84,11 @@ jsonApp jApp req = do
         . B.fromLazyByteString . encode
 
 -- | Utility for returning a JSON response in a JsonApplication
-returnJson :: (ToJSON b) => b -> ResourceT IO (Either Response b)
+returnJson :: (ToJSON b) => b -> IO (Either Response b)
 returnJson = return . Right
 
 -- | Utility for returning 'Response' response in a JsonApplication
-returnResponse :: (ToJSON b) => Response -> ResourceT IO (Either Response b)
+returnResponse :: (ToJSON b) => Response -> IO (Either Response b)
 returnResponse = return . Left
 
 

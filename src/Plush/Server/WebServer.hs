@@ -130,7 +130,7 @@ server mkRunner port reportInfo = do
     settings port' logger = Warp.defaultSettings
         { Warp.settingsPort = port'
         , Warp.settingsHost = Host "127.0.0.1"
-        , Warp.settingsOnException = logError logger
+        , Warp.settingsOnException = (\_ -> logError logger)
         }
     genKey = replicateM 40 $ randomRIO ('a','z')
 
